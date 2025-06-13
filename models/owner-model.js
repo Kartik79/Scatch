@@ -4,10 +4,10 @@ const ownerSchema=mongoose.Schema({
     fullname:String,
     email:String,
     password:String,
-    products: {
-        type:Array,
-        default:[]
-    },
+    products: [{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'product'
+    }],
     gstin:String
 });
 

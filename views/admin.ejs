@@ -2,7 +2,7 @@
     <div class="w-full h-screen flex items-start px-20 py-20">
         
         <div class="w-[100%] flex flex-col gap-5 h-screen">
-            <a class="text-red-500" href="">Delete all</a>
+            <a class="text-red-500" href="/owners/deleteall">Delete all</a>
             <div class="flex items-start gap-5">
                 <% products.forEach((product) => { %>
                     <div class="w-60">
@@ -19,8 +19,12 @@
                                 <h4>₹ <%= product.price %>
                                 </h4>
                             </div>
-                            <a class="w-7 h-7 flex items-center justify-center rounded-full bg-white" href="/addtocart/<%= product._id %>">
+                            <a class="w-7 h-7 flex items-center justify-center rounded-full bg-white" href="/owners/add/<%= product._id %>">
                                 <i class="ri-add-line"></i>
+                            </a>
+                            <%= product.quantity %>
+                            <a class="w-7 h-7 flex items-center justify-center rounded-full bg-white" href="/owners/subtract/<%= product._id %>">
+                                <i class="ri-subtract-line"></i>
                             </a>
                         </div>
                     </div>

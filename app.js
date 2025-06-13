@@ -45,13 +45,6 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use((req, res, next) => {
-  console.log("token_user:", req.cookies.token_user);
-  console.log("token_owner:", req.cookies.token_owner);
-  next();
-});
-
-
 app.use("/", indexRouter);
 app.use("/owners",ownersRouter);
 app.use("/users",usersRouter);

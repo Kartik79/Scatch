@@ -2,7 +2,8 @@ const jwt = require('jsonwebtoken');
 const ownerModel = require('../models/owner-model');
 
 module.exports = async (req, res, next) => {
-    if (!req.cookies.token_owner) {
+    const token=req.cookies.token_owner;
+    if (!token) {
         req.flash("error", "You need to log in as owner");
         return res.redirect("/owners");
     }
@@ -15,8 +16,8 @@ module.exports = async (req, res, next) => {
             res.clearCookie("token_owner");
             return res.redirect("/owners");
         }
-
-        req.user = owner;
+        console.log(owner);
+        req.owner = owner;
         req.userType = "owner";
         next();
     } catch (err) {

@@ -18,6 +18,7 @@ router.get("/shop",isLoggedin,async (req,res)=> {
     res.render("shop",{products,success});
 });
 router.get("/cart",isLoggedin,async (req,res)=> {
+    console.log(req.user);
     let user=await userModel.findOne({email:req.user.email}).populate("cart");
     const cartWithBill=user.cart.map(item => ({
         ...item.toObject(),
