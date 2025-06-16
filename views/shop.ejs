@@ -49,7 +49,9 @@
                             <a class="w-7 h-7 flex items-center justify-center rounded-full bg-white" href="/users/add/<%= product._id %>">
                             <i class="ri-add-line"></i>
                         </a>
-                        <div class="px-2 py-1 rounded-md bg-white text-black"></div>
+                        <div class="px-2 py-1 rounded-md bg-white text-black">
+                            <%= quantityMap[product._id.toString()] || 0 %>
+                        </div>
                         <a class="w-7 h-7 flex items-center justify-center rounded-full bg-white" href="/users/subtract/<%= product._id %>">
                             <i class="ri-subtract-line"></i>
                         </a>

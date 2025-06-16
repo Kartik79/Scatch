@@ -4,6 +4,7 @@ const isLoggedin = require('../middlewares/isLoggedin');
 const userModel = require('../models/user-model');
 const productModel = require('../models/product-model');
 const router=express.Router();
+const upload = require('../config/multer-config');
 
 router.get("/",(req,res)=> {
     res.send("hey");
@@ -12,51 +13,28 @@ router.post("/register",registerUser);
 router.post("/login",loginUser);
 router.get("/logout",logout);
 
-router.get("/shop",isLoggedin,async (req,res)=> {
-    let products=await productModel.find();
-    let success=req.flash("success")
-    res.render("shop",{products,success});
+router.get("/shop", isLoggedin, async (req, res) => {
+    const products = await productModel.find();
+    const success = req.flash("success");
+
+    const user = await userModel.findOne({ email: req.user.email }).populate("cart");
+
+    const quantityMap = {};
+    if (user.cart && user.cart.length) {
+        user.cart.forEach(item => {
+            const id = item._id.toString();
+            quantityMap[id] = (quantityMap[id] || 0) + 1;
+        });
+    }
+
+    res.render("shop", {
+        products,
+        success,
+        quantityMap
+    });
 });
-// router.get("/cart",isLoggedin,async (req,res)=> {
-//     let user=await userModel.findOne({email:req.user.email}).populate("cart");
-//     // const cartWithBill=user.cart.map(item => ({
-//     //     ...item.toObject(),
-//     //     bill: item.price+20-item.discount
-//     // }));
 
-//     // res.render("cart",{user,cart:cartWithBill});
-//     const cart = user.cart;
 
-//     // Group by product content (name, price, discount etc.)
-//     const groupedCart = [];
-
-//     for (let product of cart) {
-//         const existing = groupedCart.find(item =>
-//             item.name === product.name &&
-//             item.price === product.price &&
-//             item.discount === product.discount &&
-//             item.bgcolor === product.bgcolor &&
-//             item.panelcolor === product.panelcolor &&
-//             item.textcolor === product.textcolor
-//         );
-
-//         if (existing) {
-//             existing.quantity += 1;
-//         } else {
-//             groupedCart.push({
-//                 ...product.toObject(),
-//                 quantity: 1
-//             });
-//         }
-//     }
-
-//     const cartWithBill = groupedCart.map(item => ({
-//         ...item,
-//         bill: item.quantity * (item.price + 20 - item.discount)
-//     }));
-
-//     res.render("cart", { user, cart: cartWithBill });
-// });
 router.get("/cart", isLoggedin, async (req, res) => {
     const user = await userModel.findOne({ email: req.user.email }).populate("cart");
 
@@ -70,12 +48,24 @@ router.get("/cart", isLoggedin, async (req, res) => {
         }
     });
 
+    const platformFee = 20;
+
     const cartWithBill = Object.values(productMap).map(item => ({
         ...item,
-        bill: item.quantity * (item.price + 20 - item.discount)
+        bill: item.quantity * (item.price + platformFee - item.discount)
     }));
 
-    res.render("cart", { user, cart: cartWithBill });
+    const subtotal = cartWithBill.reduce((sum, item) => sum + item.bill, 0);
+    const shippingFee = subtotal < 1000 ? 35 : 0;
+    const totalAmount = subtotal + shippingFee;
+
+    res.render("cart", {
+        user,
+        cart: cartWithBill,
+        subtotal,
+        shippingFee,
+        totalAmount
+    });
 });
 
 router.get("/addtocart/:id",isLoggedin,async (req,res)=> {
@@ -110,5 +100,36 @@ router.get("/subtract/:id", isLoggedin, async (req, res) => {
         res.send("Error subtracting product from cart: " + err.message);
     }
 });
+
+router.get("/profile", isLoggedin, async (req, res) => {
+    const user = await userModel.findOne({ email: req.user.email }).populate("cart");
+    let success = req.flash("success");
+    res.render("profile", { user, success });
+});
+
+router.post("/profile/update", isLoggedin, upload.single("picture"), async (req, res) => {
+    const { fullname, email, contact } = req.body;
+    const updates = {
+        fullname,
+        email,
+        contact
+    };
+
+    if (req.file) {
+        updates.picture = req.file.buffer;
+    }
+
+    await userModel.findByIdAndUpdate(req.user._id, updates);
+    req.flash("success", "Profile updated successfully!");
+    res.redirect("/users/profile");
+});
+
+router.get('/orders', isLoggedin, async (req, res) => {
+  const user = await userModel.findOne({ email: req.user.email });
+  res.render('orders', { user });
+});
+
+
+
 
 module.exports=router;

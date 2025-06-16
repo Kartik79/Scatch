@@ -1,0 +1,59 @@
+<%- include('./partials/header') %>
+
+
+<div class="container mx-auto p-6">
+    <div class="bg-white p-6 rounded shadow-md max-w-lg mx-auto">
+        <div class="text-center mb-6">
+            <img class="w-24 h-24 rounded-full mx-auto object-cover border" 
+                src="<%= user.picture ? 'data:image/jpeg;base64,' + user.picture.toString('base64') : '/default-profile.png' %>" 
+                alt="Profile Picture">
+
+            <h2 class="text-2xl font-semibold mt-3"><%= user.fullname %></h2>
+            <p class="text-gray-600"><%= user.email %></p>
+            <p class="text-gray-600">Contact: <%= user.contact || "Not Provided" %></p>
+        </div>
+
+        <div class="text-center mb-4">
+            <button id="showUpdateForm" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                Update Profile
+            </button>
+
+            <a href="/users/orders" class="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                View Orders
+            </a>
+        </div>
+
+        <!-- Update Form (initially hidden) -->
+        <div id="updateForm" class="mt-6 hidden">
+            <form action="/users/profile/update" method="POST" enctype="multipart/form-data" class="space-y-4">
+                <input type="text" name="fullname" value="<%= user.fullname %>" placeholder="Name" class="w-full border px-3 py-2 rounded" required />
+                <input type="email" name="email" value="<%= user.email %>" placeholder="Email" class="w-full border px-3 py-2 rounded" required />
+                <input type="text" name="contact" value="<%= user.contact || '' %>" placeholder="Phone Number" class="w-full border px-3 py-2 rounded" />
+                <input type="file" name="picture" class="w-full border px-3 py-2 rounded" />
+
+                <div class="flex gap-4">
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
+                    <button type="button" id="cancelUpdateForm" class="bg-gray-400 text-white px-4 py-2 rounded">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const showBtn = document.getElementById("showUpdateForm");
+    const cancelBtn = document.getElementById("cancelUpdateForm");
+    const form = document.getElementById("updateForm");
+
+    showBtn.addEventListener("click", () => {
+        form.classList.remove("hidden");
+        showBtn.classList.add("hidden");
+    });
+
+    cancelBtn.addEventListener("click", () => {
+        form.classList.add("hidden");
+        showBtn.classList.remove("hidden");
+    });
+</script>
+
+<%- include('./partials/footer') %>
