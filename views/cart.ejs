@@ -62,14 +62,23 @@
                 <div class="flex gap-10">
                 <h4 class="text-md">Shipping:</h4>
                 <h4>₹ <%= shippingFee === 0 ? 'FREE' : shippingFee %></h4>
-            </div>
-            <div class="w-full h-[1px] bg-black my-3"></div>
-            <div class="flex gap-10 text-xl font-bold">
-                <h4>Total Payable:</h4>
-                <h4>₹ <%= totalAmount %></h4>
-            </div>
+                </div>
+                <div class="w-full h-[1px] bg-black my-3"></div>
+                    <div class="flex gap-10 text-xl font-bold">
+                            <h4>Total Payable:</h4>
+                            <h4>₹ <%= totalAmount %></h4>
+                    </div>
+                    <form action="/users/placeorder" method="POST">
+                        <input type="hidden" name="totalAmount" value="<%= totalAmount %>" />
+                        <button
+                            type="submit"
+                            class="mt-6 px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+                        >
+                            Place Order
+                        </button>
+                    </form>
+                </div>
         </div>
-    </div>
 <% } else { %>
     <div class="text-center py-20 text-xl text-gray-600">Your cart is empty.</div>
 <% } %>
